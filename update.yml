@@ -1,0 +1,87 @@
+name: Update pensioen RSS
+
+on:
+  schedule:
+    - cron: "30 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-rss:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update pensioen.xml
+        run: |
+          python << 'PY'
+          from datetime import datetime, timezone, date
+          from email.utils import format_datetime
+          import html
+
+          PENSION_DATE = date(2027, 8, 10)
+          today = datetime.now(timezone.utc).date()
+          days = max(0, (PENSION_DATE - today).days)
+
+          def status_text(d):
+              if d <= 0:
+                  return ("Missie geslaagd", "Peter heeft de eindstreep bereikt. Bedankt voor alle inzet en geniet van een welverdiend pensioen!")
+              if d == 1:
+                  return ("Laatste missie", "Morgen wordt Peter officieel losgelaten op de vrije wereld. Wij wensen de buren alvast veel succes.")
+              if d <= 10:
+                  return ("Alarmniveau rood", "Alle systemen gereed. De slingers liggen klaar. De taartcommissie draait overuren.")
+              if d <= 50:
+                  return ("Alarmniveau oranje", "De pensioenradar slaat uit. Het bureau oogt verdacht netjes en afscheidsspeeches worden geoefend.")
+              if d <= 100:
+                  return ("Alarmniveau geel", "De expeditie nadert de eindhaven. De koffieconsumptie stijgt en de verhalen worden langer.")
+              if d <= 150:
+                  return ("Koersvast", "Kapitein Peter houdt koers. De collega's beginnen voorzichtig af te tellen.")
+              if d <= 250:
+                  return ("Voorbereidingen gestart", "Er gaan geruchten over een geheime voorraad toverdrank. Nog geen menhir gesignaleerd.")
+              if d <= 365:
+                  return ("Expeditie actief", "Nog minder dan een jaar. Er wordt voorzichtig gesproken over reisplannen, maar niemand kan dat bevestigen.")
+              return ("Normale bedrijfsvoering", "Peter houdt dapper stand. De route is uitgezet en de koffievoorraad is voldoende.")
+
+          status, text = status_text(days)
+          now = datetime.now(timezone.utc)
+          rss_date = format_datetime(now)
+          date_id = today.isoformat()
+
+          xml = f'''<?xml version="1.0" encoding="UTF-8"?>
+          <rss version="2.0">
+            <channel>
+              <title>Pensioenmonitor Peter</title>
+              <link>https://krishnao7o.github.io/Pensioen-Peetje/</link>
+              <description>Dagelijkse statusupdate richting Peter&apos;s pensioen.</description>
+              <language>nl-nl</language>
+              <lastBuildDate>{rss_date}</lastBuildDate>
+              <item>
+                <title>Pensioenmonitor: nog {days} dagen tot Peter&apos;s pensioen</title>
+                <link>https://krishnao7o.github.io/Pensioen-Peetje/</link>
+                <guid>pensioen-peter-{date_id}</guid>
+                <pubDate>{rss_date}</pubDate>
+                <description><![CDATA[
+                  <p><strong>Nog {days} dagen tot Peter's pensioen.</strong></p>
+                  <p><strong>Status:</strong> {html.escape(status)}</p>
+                  <p>{html.escape(text)}</p>
+                  <p>Kuifwaardige expeditie, Gallische voorbereiding en tot nu toe geen menhir op de werkvloer gesignaleerd.</p>
+                ]]></description>
+              </item>
+            </channel>
+          </rss>
+          '''
+          with open("pensioen.xml", "w", encoding="utf-8") as f:
+              f.write(xml)
+          PY
+
+      - name: Commit update
+        run: |
+          git config user.name "Pensioen Bot"
+          git config user.email "actions@github.com"
+          git add pensioen.xml
+          git commit -m "Update pensioen RSS" || echo "Geen wijziging"
+          git push
