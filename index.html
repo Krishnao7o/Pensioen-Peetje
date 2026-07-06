@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pensioen Monitor</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#f4f6f8;
+    font-family:"Segoe UI",Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.panel{
+
+    width:900px;
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 15px 40px rgba(0,0,0,.18);
+
+}
+
+.header{
+
+    background:#74256d;
+    color:white;
+    padding:25px;
+
+}
+
+.header h1{
+
+    margin:0;
+    font-size:34px;
+
+}
+
+.content{
+
+    padding:45px;
+    text-align:center;
+
+}
+
+.label{
+
+    color:#888;
+    font-size:22px;
+
+}
+
+#dagen{
+
+    font-size:170px;
+    font-weight:bold;
+    color:#74256d;
+    line-height:1;
+
+}
+
+.status{
+
+    display:inline-block;
+    margin-top:25px;
+    padding:15px 35px;
+    border-radius:30px;
+    background:#e7f6ea;
+    color:#2e7d32;
+    font-size:26px;
+    font-weight:bold;
+
+}
+
+.quote{
+
+    margin-top:35px;
+    font-size:26px;
+    color:#444;
+
+}
+
+.footer{
+
+    background:#efefef;
+    padding:18px;
+    text-align:center;
+    color:#777;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="panel">
+
+<div class="header">
+
+<h1>Saffier Operationeel Dashboard</h1>
+
+</div>
+
+<div class="content">
+
+<div class="label">
+
+Resterende dagen tot pensioen van
+
+</div>
+
+<h2>🎉 Peter "Grijze Reigâh" Fransen 🎉</h2>
+
+<div id="dagen">400</div>
+
+<div class="status" id="status">
+
+Operationeel
+
+</div>
+
+<div class="quote" id="quote">
+
+Hij ontkent nog steeds dat hij aftelt...
+
+</div>
+
+</div>
+
+<div class="footer">
+
+Automatisch bijgewerkt • Iedere minuut
+
+</div>
+
+</div>
+
+<script>
+
+const pensioenDatum = new Date("2027-08-10T17:00:00");
+
+function update(){
+
+    const nu = new Date();
+
+    const verschil = pensioenDatum - nu;
+
+    const dagen = Math.ceil(verschil/(1000*60*60*24));
+
+    document.getElementById("dagen").innerHTML=dagen;
+
+    let tekst="";
+    let status="";
+
+    if(dagen>365){
+
+        status="Normale bedrijfsvoering";
+        tekst="Hij zegt dat hij nog lang niet met pensioen gaat.";
+
+    }else if(dagen>250){
+
+        status="Voorbereidingen gestart";
+        tekst="Stiekem kijkt hij al naar campers.";
+
+    }else if(dagen>150){
+
+        status="Waakzaam";
+        tekst="Het bureau wordt langzaam opgeruimd.";
+
+    }else if(dagen>100){
+
+        status="Code Geel";
+        tekst="Collega's beginnen zich zorgen te maken.";
+
+    }else if(dagen>50){
+
+        status="Code Oranje";
+        tekst="De pensioenverhalen nemen toe.";
+
+    }else if(dagen>10){
+
+        status="Code Rood";
+        tekst="Nog héél even volhouden.";
+
+    }else if(dagen>1){
+
+        status="Laatste loodjes";
+        tekst="De taart is besteld 🍰";
+
+    }else if(dagen==1){
+
+        status="Morgen Vrij!";
+        tekst="Nog één dag...";
+
+    }else{
+
+        status="GENIET!";
+        tekst="Officieel met pensioen! 🥳🍾";
+
+    }
+
+    document.getElementById("status").innerHTML=status;
+    document.getElementById("quote").innerHTML=tekst;
+
+}
+
+update();
+
+setInterval(update,60000);
+
+</script>
+
+</body>
+
+</html>
